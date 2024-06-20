@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OPES Insurance</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .highlight {
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">TRÍCH XUẤT DƯ NỢ BẢO HIỂM KHOẢN VAY OPES</h1>
+        <form id="insuranceForm" action="/process" method="post" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="partner_name" class="form-label">Đối tác được bảo hiểm</label>
+                <select class="form-select" id="partner_name" name="partner_name">
+                    <option value="VPBANK-RB">VPBANK-RB</option>
+                    <option value="VPBANK-SME">VPBANK-SME</option>
+                    <option value="FFC">FFC</option>
+                    <option value="MAFC">MAFC</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <p class="error" id="errorMessage">Chỉ đối tác VPBANK-RB được phép thực hiện bước này.</p>
+            </div>
+            <div class="mb-3">
+                <label for="pdf" class="form-label">Tải lên file pdf scan lịch trả nợ</label>
+                <input type="file" class="form-control" id="pdf" name="pdf" accept="application/pdf" required/>
+            </div>
+            <div class="mb-3">
+                <label for="text" class="form-label">Nhập ngày phát sinh sự kiện bảo hiểm</label>
+                <input type="text" class="form-control" id="text" name="text" placeholder="YYYYMMDD, để trống nếu là hôm nay" required/>
+            </div>
+            <button type="submit" class="btn btn-primary">Process</button>
+        </form>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('insuranceForm').addEventListener('submit', function(event) {
+            const partnerName = document.getElementById('partner_name').value;
+            if (partnerName !== 'VPBANK-RB') {
+                event.preventDefault();
+                document.getElementById('errorMessage').style.display = 'block';
+            } else {
+                document.getElementById('errorMessage').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
+----------------------------------------
+app.py
+from flask import Flask, render_template, request
+from utils.process import get_results_pdf
+import json
+import os
+import threading
+import webbrowser
+
+app = Flask(__name__)
+app.static_folder = 'static'
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/process', methods=['POST'])
+def process():
+    if request.method == 'POST':
+        pdf = request.files['pdf']
+        requested_date = request.form['text']
+        pdf_path = os.path.join('static', 'input_file.pdf')
+        pdf.save(pdf_path)
+        
+        print("received requested date:", requested_date)
+        
+        # Clear temp file
+        output_temp_file = os.path.join('static', 'output_img.png')
+        if os.path.isfile(output_temp_file):
+            os.remove(output_temp_file)
+        
+        # perform OCR
+        ocr_result = get_results_pdf(pdf_path, requested_date, inplace_img=True)
+        json_results = {
+            "insurance_balance": ocr_result,
+            "system_info": {
+                "version": "1.0"
+            }
+        }
+
+        return render_template('result.html', time=time, result=json.dumps(json_results, indent=4, sort_keys=True))
+
+def open_browser():
+    webbrowser.open_new('http://127.0.0.1:5000/')
+
+if __name__ == '__main__':
+    threading.Timer(1, open_browser).start()
+    app.run(debug=False) 
+//
+result.html 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Result</title>
+    <style>
+        .highlight {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Result</h1>
+    <p>{{ result }}</p>
+    <img src="{{ url_for('static', filename='output_img.png') }}" alt="Result Image" style="max-width: 100%"/>
+
+    <h2>JSON Display with Highlighted Level</h2>
+    <pre id="jsonDisplay"></pre>
+
+    <script>
+        const jsonString = `{{ result|safe }}`;
+
+        function syntaxHighlight(json) {
+            if (typeof json != 'string') {
+                json = JSON.stringify(json, undefined, 2);
+            }
+            json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return json.replace(/(\"level\": )(\".*?\")/g, '$1<span class="highlight">$2</span>');
+        }
+
+        const highlightedJsonString = syntaxHighlight(jsonString);
+        document.getElementById('jsonDisplay').innerHTML = highlightedJsonString;
+    </script>
+</body>
+</html>
+//
