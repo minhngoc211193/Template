@@ -62,6 +62,16 @@
             }
         });
     </script>
+    <script>
+    document.getElementById('insuranceForm').addEventListener('submit', function(event) {
+        const partnerName = document.getElementById('partner_name').value;
+        if (partnerName !== 'VPBANK-RB') {
+            event.preventDefault(); // Ngăn không cho form gửi đi
+            alert('Chỉ đối tác VPBANK-RB mới được phép sử dụng dịch vụ này.'); // Hiển thị thông báo
+            window.location.reload(); // Tải lại trang để nhập lại
+        }
+    });
+</script>
 </body>
 </html>
 
