@@ -3,57 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Sign Up Form by Colorlib</title>
+    <title>OPES insurance</title>
 
-    <!-- Font Icon -->
-    <link rel="stylesheet" href="fonts/material-icon/css/material-design-iconic-font.min.css">
-
-    <!-- Main css -->
-    <link rel="stylesheet" href="css/style.css">
+        <!-- Main css -->
+        <link rel="stylesheet" href="{{ url_for ('static', filename='style.css') }}">
 </head>
 <body>
 
-    <div class="main">
-
-        <section class="signup">
-            <!-- <img src="images/signup-bg.jpg" alt=""> -->
-            <div class="container">
-                <div class="signup-content">
-                    <form method="POST" id="signup-form" class="signup-form">
-                        <h2 class="form-title">Create account</h2>
-                        <div class="form-group">
-                            <input type="text" class="form-input" name="name" id="name" placeholder="Your Name"/>
+    <section class="vh-100 gradient-custom">
+        <div class="container py-5 h-100">
+          <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+              <div class="card bg-dark text-white" style="border-radius: 1rem;">
+                <div class="card-body p-5 text-center">
+                  <div class="mb-md-5 mt-md-4 pb-5">
+                    <h1 class="fw-bold mb-2 text-uppercase">TRÍCH XUẤT DƯ NỢ BẢO HIỂM KHOẢN VAY OPES</h1>
+                    <form id="insuranceForm" action="/process" method="post" enctype="multipart/form-data">
+                        <div data-mdb-input-init class="form-outline form-white mb-4">
+                            <label for="partner_name" class="form-label">Đối tác được bảo hiểm</label>
+                            <select class="form-select" id="partner_name" name="partner_name">
+                                <option value="VPBANK-RB">VPBANK-RB</option>
+                                <option value="VPBANK-SME">VPBANK-SME</option>
+                                <option value="FFC">FFC</option>
+                                <option value="MAFC">MAFC</option>
+                            </select>
                         </div>
-                        <div class="form-group">
-                            <input type="email" class="form-input" name="email" id="email" placeholder="Your Email"/>
+                        <div class="mb-3">
+                            <label for="pdf" class="form-label">Tải lên file pdf scan lịch trả nợ</label>
+                            <input type="file" class="form-control form-control-lg" id="pdf" name="pdf" accept="application/pdf" required/>
                         </div>
-                        <div class="form-group">
-                            <input type="text" class="form-input" name="password" id="password" placeholder="Password"/>
-                            <span toggle="#password" class="zmdi zmdi-eye field-icon toggle-password"></span>
+                        <div class="mb-3">
+                            <label for="text" class="form-label">Nhập ngày phát sinh sự kiện bảo hiểm</label>
+                            <input type="text" class="form-control form-control-lg" id="text" name="text" placeholder="YYYYMMDD, để trống nếu là hôm nay" required/>
                         </div>
-                        <div class="form-group">
-                            <input type="password" class="form-input" name="re_password" id="re_password" placeholder="Repeat your password"/>
-                        </div>
-                        <div class="form-group">
-                            <input type="checkbox" name="agree-term" id="agree-term" class="agree-term" />
-                            <label for="agree-term" class="label-agree-term"><span><span></span></span>I agree all statements in  <a href="#" class="term-service">Terms of service</a></label>
-                        </div>
-                        <div class="form-group">
-                            <input type="submit" name="submit" id="submit" class="form-submit" value="Sign up"/>
-                        </div>
+                        <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-light btn-lg px-5">Process</button>
                     </form>
-                    <p class="loginhere">
-                        Have already an account ? <a href="#" class="loginhere-link">Login here</a>
-                    </p>
+                   
+      
+                  </div>
                 </div>
+              </div>
             </div>
-        </section>
+          </div>
+        </div>
+      </section>
 
-    </div>
-
-    <!-- JS -->
-    <script src="vendor/jquery/jquery.min.js"></script>
-    <script src="js/main.js"></script>
-</body><!-- This templates was made by Colorlib (https://colorlib.com) -->
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('insuranceForm').addEventListener('submit', function(event) {
+            const partnerName = document.getElementById('partner_name').value;
+            if (partnerName !== 'VPBANK-RB') {
+                event.preventDefault();
+                document.getElementById('errorMessage').style.display = 'block';
+            } else {
+                document.getElementById('errorMessage').style.display = 'none';
+            }
+        });
+    </script>
+</body>
 </html>
+
