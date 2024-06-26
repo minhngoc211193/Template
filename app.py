@@ -87,3 +87,11 @@ def perform_ocr(pdf_path):
 if __name__ == '__main__':
     app.run(debug=True)
 
+
+@app.route('/history')
+def view_history():
+    with open(LOG_FILE_PATH, 'r') as file:
+        logs = file.readlines()
+    return '<br>'.join(logs)
+
+
