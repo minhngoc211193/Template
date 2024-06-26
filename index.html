@@ -4,141 +4,104 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OPES insurance</title>
-
-        <!-- Main css -->
-        <link rel="stylesheet" href="{{ url_for ('static', filename='style.css') }}">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url('/static/vpbank_bg.png');
+            background-size: cover;
+            background-position: center;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 30px auto;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        h1 {
+            color: #0056b3;
+            text-align: center;
+        }
+        p {
+            margin: 10px 0 5px;
+        }
+        select, input[type="file"], input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #004494;
+        }
+        #loading {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.8); /* Nền mờ */
+            border-radius: 10px; /* Viền tròn cho loader */
+            padding: 20px; /* Thêm padding cho loader */
+        }
+        #loading img {
+            width: 100px; /* Điều chỉnh kích thước của hình ảnh động */
+            height: auto;
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <h1>TRÍCH XUẤT DƯ NỢ BẢO HIỂM KHOẢN VAY OPES</h1>
+        <form action="/process" method="post" enctype="multipart/form-data" onsubmit="return validatePartner()">
+            <p> Đối tác được bảo hiểm </p>
+            <select id="partner_name" name="partner_name">
+                <option value="VPBANK-RB">VPBANK-RB</option>
+                <option value="VPBANK-SME">VPBANK-SME</option>
+                <option value="FEC">FEC</option>
+                <option value="MAFC">MAFC</option>
+            </select>
+            <p> Tải lên file pdf scan lịch trả nợ</p>
+            <input type="file" name="pdf" accept="application/pdf" required>
+            <p> Nhập ngày phát sinh sự kiện bảo hiểm</p>
+            <input type="text" name="text" placeholder="YYYYMMDD, Để trống nếu là hôm nay" required>
+            <button type="submit">Process</button>
+        </form>
+    </div>
+    <div id="loading">
+        <img src="/static/loading.gif" alt="Loading...">
+    </div>
 
-    <section class="vh-100 gradient-custom">
-        <div class="container py-5 h-100">
-          <div class="row d-flex justify-content-center align-items-center h-100">
-            <div class="col-12 col-md-8 col-lg-6 col-xl-5">
-              <div class="card bg-dark text-white" style="border-radius: 1rem;">
-                <div class="card-body p-5 text-center">
-                  <div class="mb-md-5 mt-md-4 pb-5">
-                    <h1 class="fw-bold mb-2 text-uppercase">TRÍCH XUẤT DƯ NỢ BẢO HIỂM KHOẢN VAY OPES</h1>
-                    <form id="insuranceForm" action="/process" method="post" enctype="multipart/form-data">
-                        <div data-mdb-input-init class="form-outline form-white mb-4">
-                            <label for="partner_name" class="form-label">Đối tác được bảo hiểm</label>
-                            <select class="form-select" id="partner_name" name="partner_name">
-                                <option value="VPBANK-RB">VPBANK-RB</option>
-                                <option value="VPBANK-SME">VPBANK-SME</option>
-                                <option value="FFC">FFC</option>
-                                <option value="MAFC">MAFC</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="pdf" class="form-label">Tải lên file pdf scan lịch trả nợ</label>
-                            <input type="file" class="form-control form-control-lg" id="pdf" name="pdf" accept="application/pdf" required/>
-                        </div>
-                        <div class="mb-3">
-                            <label for="text" class="form-label">Nhập ngày phát sinh sự kiện bảo hiểm</label>
-                            <input type="text" class="form-control form-control-lg" id="text" name="text" placeholder="YYYYMMDD, để trống nếu là hôm nay" required/>
-                        </div>
-                        <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-light btn-lg px-5">Process</button>
-                    </form>
-                   
-      
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.getElementById('insuranceForm').addEventListener('submit', function(event) {
-            const partnerName = document.getElementById('partner_name').value;
-            if (partnerName !== 'VPBANK-RB') {
-                event.preventDefault();
-                document.getElementById('errorMessage').style.display = 'block';
-            } else {
-                document.getElementById('errorMessage').style.display = 'none';
+        function validatePartner() {
+            var partner = document.getElementById('partner_name').value;
+            if (partner !== 'VPBANK-RB') {
+                alert('Mô hình chưa hỗ trợ các mẫu lịch trả nợ từ các đối tác này');
+                return false;
             }
-        });
+            document.getElementById('loading').style.display = 'block';
+            return true;
+        }
     </script>
     <script>
-    document.getElementById('insuranceForm').addEventListener('submit', function(event) {
-        const partnerName = document.getElementById('partner_name').value;
-        if (partnerName !== 'VPBANK-RB') {
-            event.preventDefault(); // Ngăn không cho form gửi đi
-            alert('Chỉ đối tác VPBANK-RB mới được phép sử dụng dịch vụ này.'); // Hiển thị thông báo
-            window.location.reload(); // Tải lại trang để nhập lại
+        window.onload = function() {
+            document.getElementById('loading').style.display = 'none';
         }
-    });
-</script>
+    </script>
 </body>
 </html>
-
-.gradient-custom {
-  /* Existing gradient background styles */
-  background: #6a11cb;  /* fallback for old browsers */
-  background: -webkit-linear-gradient(to right, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1)); /* Chrome 10-25, Safari 5.1-6 */
-  background: linear-gradient(to right, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1)); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-  
-  /* Flexbox styles for centering */
-  display: flex;        /* Enables Flexbox */
-  justify-content: center; /* Centers horizontally */
-  align-items: center;  /* Centers vertically */
-  min-height: 100vh;    /* Makes sure the section takes at least the height of the viewport */
-}
-
-.container {
-  width: 100%;          /* Full width */
-  max-width: 1200px;    /* Maximum width of the content */
-  padding: 20px;        /* Padding around the content */
-}
-
-.card {
-    background: rgba(0, 0, 0, 0.8); /* Slightly transparent black */
-    border-radius: 1rem;
-    padding: 20px;
-    text-align: center; /* Căn giữa nội dung văn bản */
-    display: flex;
-    flex-direction: column; /* Sắp xếp các mục theo chiều dọc */
-    justify-content: center; /* Căn giữa theo chiều ngang */
-    align-items: center; /* Căn giữa theo chiều dọc */
-}
-
-.form-outline, .mb-3 {
-    width: 100%; /* Chiều rộng tối đa cho các phần tử form */
-}
-
-#insuranceForm {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.form-label {
-    margin-bottom: 0.5rem;
-}
-
-.form-select, .form-control {
-    width: 100%; /* Chiều rộng cho các phần tử input và select */
-    padding: 0.375rem 0.75rem; /* Đệm cho các phần tử input */
-}
-
-.btn {
-    margin-top: 1rem; /* Khoảng cách trên cho nút */
-}
-.form-group {
-    display: flex;            /* Bật Flexbox */
-    align-items: center;      /* Căn giữa các mục theo chiều dọc */
-    justify-content: space-between; /* Phân bố khoảng cách đều giữa các mục */
-    margin-bottom: 1rem;      /* Thêm một chút khoảng cách dưới cùng */
-}
-
-.form-label {
-    margin-right: 1rem;       /* Thêm khoảng cách phải cho nhãn */
-}
-
-.form-select {
-    flex-grow: 1;             /* Cho phép trường chọn mở rộng để chiếm phần còn lại của hàng */
-}
-

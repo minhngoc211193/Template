@@ -1,9 +1,30 @@
-# Template
-file index.html
-HTML: Thêm một đoạn thông báo lỗi (p với class error) để hiển thị thông báo khi người dùng chọn tùy chọn không hợp lệ.
-CSS: Thêm class error để định dạng thông báo lỗi.
-JavaScript: Thêm sự kiện submit vào form. Khi người dùng nhấn nút "Process", sự kiện này sẽ kiểm tra giá trị của select. Nếu giá trị không phải là "VPBANK-RB", nó sẽ hiển thị thông báo lỗi và ngăn không cho form gửi đi.
-Bootstrap CSS và JS: Thêm liên kết tới Bootstrap CSS và JavaScript từ CDN.
-HTML: Sử dụng các lớp Bootstrap như container, form-control, btn, form-select, form-label, mb-3, và mt-5 để tạo giao diện đẹp mắt.
-JavaScript: Kiểm tra giá trị của select và hiển thị thông báo lỗi nếu giá trị không phải là "VPBANK-RB".
-Lưu file này và mở nó trong trình duyệt để kiểm tra kết quả. Khi người dùng chọn một tùy chọn khác ngoài "VPBANK-RB" và cố gắng gửi form, thông báo lỗi sẽ xuất hiện và việc gửi form sẽ bị chặn lại.
+# OPES INSURANCE BALANCE EXTRACTION
+This service is for extracting information from loan payment schedules to calculate insured balance.
+
+Input/Output
+---
+
+Input: 
+- Insurance event date: inputted string
+- Loan payment schedule: pdf file
+- Credit institutions: string: VPB/FEC/MAFC
+
+Output:
+- Insured balance, insured interest, insured principal
+
+Structure
+---
+- app.py: running POC web-portal UI for demo
+- test.py: running unit tests
+
+How to run
+---
+1. Download the EasyOCR `latin_g2.pth` and `craft_mlt_25k.pth` models fromm https://jaided.ai/easyocr/modelhub/ and save them in the `./model` folder
+2. Run `pip install requirements.txt` to install necessary packages
+3. Run `python app.py` to run the application
+
+Export project to a Stand alone
+---
+To export this project to a stand alone:
+1. Run `pyinstaller opes_ocr.spec`
+2. Find the `opes_ocr.exe` in the folder `disk\opes_ocr\opes_ocr.exe`

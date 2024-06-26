@@ -8,6 +8,13 @@ from datetime import datetime
 app = Flask(__name__)
 app.static_folder = 'static'
 
+LOG_FILE_PATH = 'static/process.txt'
+def log_submission(pdf_path, results):
+    with open(LOG_FILE_PATH, 'a') as file:
+        record = f"{datetime.now()}, {pdf_path}, {json.dumps(results)}\n"
+        file.write(record)
+
+
 @app.template_filter('format_number')
 def format_number(value):
     """Format a number with commas as thousands separators."""
@@ -39,8 +46,14 @@ def process():
             "version": version,
         }
         insurance_event_date = datetime.strptime(json_results['insurance_event_date'], '%Y%m%d').strftime('%d/%m/%Y')
-
+        log_submission(pdf_path, json_results)
         return render_template("result.html", time=time, result=json_results, insurance_event_date=insurance_event_date)
+
+@app.route("/history")
+def view_history():
+    with open(LOG_FILE_PATH, 'r') as file:
+        logs = file.readlines()
+    return '<br>'.join(logs)
 
 def open_browser():
     webbrowser.open_new('http://127.0.0.1:5000/')
@@ -48,50 +61,5 @@ def open_browser():
 if __name__ == '__main__':
     threading.Timer(1, open_browser).start()
     app.run(debug=False)
-
-import os
-from flask import Flask, request
-from datetime import datetime
-import json
-
-app = Flask(__name__)
-
-# Đường dẫn đến file log
-LOG_FILE_PATH = 'submission_logs.txt'
-
-def log_submission(pdf_path, results):
-    with open(LOG_FILE_PATH, 'a') as file:
-        # Tạo bản ghi với thời gian, đường dẫn PDF và kết quả OCR
-        record = f"{datetime.now()}, {pdf_path}, {json.dumps(results)}\n"
-        file.write(record)
-
-@app.route('/upload', methods=['POST'])
-def upload():
-    pdf = request.files['pdf']
-    pdf_path = os.path.join('path/to/save', pdf.filename)
-    pdf.save(pdf_path)
-
-    # Giả sử làm OCR và lấy kết quả
-    results = perform_ocr(pdf_path)
-
-    # Ghi log vào file
-    log_submission(pdf_path, results)
-
-    return f"Uploaded and processed {pdf.filename}"
-
-def perform_ocr(pdf_path):
-    # Thực hiện xử lý OCR trên file PDF
-    # Giả định trả về kết quả dưới dạng dict
-    return {"text": "sample OCR text"}
-
-if __name__ == '__main__':
-    app.run(debug=True)
-
-
-@app.route('/history')
-def view_history():
-    with open(LOG_FILE_PATH, 'r') as file:
-        logs = file.readlines()
-    return '<br>'.join(logs)
 
 

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kết quả</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url('/static/vpbank_bg.png');
+            background-size: cover;
+            background-position: center;
+            color: #333;
+            font-size: 14px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            position: relative;
+            padding-top: 50px; /* Space for home button */
+        }
+        h1, h2, h3 {
+            color: #0056b3;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            padding-left: 20px; /* Thụt vào cho các <li> */
+        }
+        li {
+            margin-bottom: 10px;
+            padding-left: 10px; /* Thêm thụt lề nếu cần */
+        }
+        img {
+            max-width: 100%;
+            display: block;
+            padding: 10px;
+            margin-top: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .home-button {
+            padding: 8px 16px;
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+        }
+        .home-button:hover {
+            background-color: #004494;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="home-button">Trang chủ</a> <br><br>
+        <a href="/history" class="home-button">History</a>
+        <h1>Kết quả Bảo hiểm</h1>
+        <h2>Ngày phát sinh sự kiện bảo hiểm: {{ insurance_event_date }}</h2>
+        <h3>Chi tiết Dư Nợ</h3>
+        <ul>
+            <li>Tổng dư nợ: {{ result.insurance_balance.insurance_balance | format_number }} VND</li>
+            <li>Dư nợ gốc: {{ result.insurance_balance.principal | format_number }} VND</li>
+            <li>Số tiền lãi: {{ result.insurance_balance.interest | format_number }} VND</li>
+        </ul>
+        <h3>Chất lượng hình ảnh</h3>
+        <ul>
+            <li>Mức độ chất lượng: {{ result.image_quality.level }}</li>
+        </ul>
+        <h2>Hình ảnh được trích chọn</h2>
+        <img src="{{ url_for('static', filename='output_img.png') }}?t={{ time() }}" alt="Hình ảnh được trích chọn">
+    </div>
+</body>
+</html>
