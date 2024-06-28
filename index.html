@@ -105,3 +105,67 @@
     </script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Star Rating</title>
+<style>
+  .star-rating {
+    font-size: 0;
+    white-space: nowrap;
+    display: inline-block;
+    width: 125px; /* Width of 5 stars */
+    height: 25px;
+    overflow: hidden;
+    position: relative;
+    background: url('star-outline.png') repeat-x 0 0; /* Path to your star outline image */
+    cursor: pointer;
+  }
+
+  .star-rating input {
+    opacity: 0;
+    margin: 0;
+    width: 25px;
+    height: 25px;
+    position: absolute;
+    z-index: 0;
+    cursor: pointer;
+  }
+
+  .star-rating span {
+    display: block;
+    width: 125px;
+    height: 25px;
+    background: url('star-filled.png') repeat-x 0 0; /* Path to your filled star image */
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+<form action="/submit-rating" method="post">
+  <div class="star-rating">
+    <input type="radio" id="star5" name="rating" value="100" /><label for="star5" title="5 stars"></label>
+    <input type="radio" id="star4" name="rating" value="80" /><label for="star4" title="4 stars"></label>
+    <input type="radio" id="star3" name="rating" value="60" /><label for="star3" title="3 stars"></label>
+    <input type="radio" id="star2" name="rating" value="40" /><label for="star2" title="2 stars"></label>
+    <input type="radio" id="star1" name="rating" value="20" /><label for="star1" title="1 star"></label>
+    <span></span>
+  </div>
+  <button type="submit">Submit</button>
+</form>
+
+<script>
+  document.querySelector('.star-rating').addEventListener('change', (event) => {
+    const ratingValue = parseInt(event.target.value, 10);
+    const starWidth = 25; // Width of a single star
+    document.querySelector('.star-rating span').style.width = `${(ratingValue / 100) * 125}px`;
+  });
+</script>
+</body>
+</html>
+
