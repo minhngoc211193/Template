@@ -79,6 +79,7 @@
         <ul>
             <li>Mức độ chất lượng: {{ result.image_quality.level }}</li>
         </ul>
+          <input type="hidden" name="file_id" value="{{ result.get('file_id', '') }}">
         <h2>Hình ảnh được trích chọn</h2>
         <img src="{{ url_for('static', filename='output_img.png') }}?t={{ time() }}" alt="Hình ảnh được trích chọn">
     </div>
