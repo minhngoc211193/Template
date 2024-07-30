@@ -28,3 +28,5 @@ Export project to a Stand alone
 To export this project to a stand alone:
 1. Run `pyinstaller opes_ocr.spec`
 2. Find the `opes_ocr.exe` in the folder `disk\opes_ocr\opes_ocr.exe`
+3. npx create-react-app my-frontend
+cd my-frontend
